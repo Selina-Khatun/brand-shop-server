@@ -51,8 +51,31 @@ app.get('/product/:id',async(req,res)=>{
     const result=await productCollection.findOne(query);
     res.send(result);
 })
+
+app.put('/product/:id',async(req,res)=>{
+
+const id =req.params.id;
+const filter={_id:new ObjectId(id)}
+const options={upsert:true};
+const updateProduct=req.body;
+const product={
+    $set:{
+
+        name:updateProduct.name,
+         photo:updateProduct.photo,
+         brand:updateProduct.brand,
+         price:updateProduct.price,
+         category:updateProduct.category,
+         ratings:updateProduct.ratings,
+         description:updateProduct.description,
+    },
+}
+const result=await productCollection.updateOne(filter,product,options);
+res.send(result);
+});
 // cart products
-        // app.post('/cartProduct', async (req, res) => {
+        // app.post('/cartProduct'
+        //  async (req, res) => {
         //     const selectedItem = req.body;
         //     console.log(selectedItem);
         //     const result = await productCollection.insertOne(selectedItem);
