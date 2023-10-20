@@ -25,10 +25,10 @@ const client = new MongoClient(uri, {
 async function run() {
     try {
         // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
-        const cartCollection=client.db("productShopDB").collection('cartProduct');
+        // await client.connect();
+        const cartCollection = client.db("productShopDB").collection('cart');
         const productCollection = client.db("productShopDB").collection('product');
-
+        // create product
         app.post('/product', async (req, res) => {
             const newProduct = req.body;
             console.log(newProduct);
@@ -43,52 +43,52 @@ async function run() {
 
         })
 
-// update 
+        // update product
 
-app.get('/product/:id',async(req,res)=>{
-    const id =req.params.id;
-    const query={_id:new ObjectId(id)}
-    const result=await productCollection.findOne(query);
-    res.send(result);
-})
+        app.get('/product/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await productCollection.findOne(query);
+            res.send(result);
+        })
 
-app.put('/product/:id',async(req,res)=>{
+        app.put('/product/:id', async (req, res) => {
 
-const id =req.params.id;
-const filter={_id:new ObjectId(id)}
-const options={upsert:true};
-const updateProduct=req.body;
-const product={
-    $set:{
+            const id = req.params.id;
+            const filter = { _id: new ObjectId(id) }
+            const options = { upsert: true };
+            const updateProduct = req.body;
+            const product = {
+                $set: {
 
-        name:updateProduct.name,
-         photo:updateProduct.photo,
-         brand:updateProduct.brand,
-         price:updateProduct.price,
-         category:updateProduct.category,
-         ratings:updateProduct.ratings,
-         description:updateProduct.description,
-    },
-}
-const result=await productCollection.updateOne(filter,product,options);
-res.send(result);
-});
-// cart products
-        // app.post('/cartProduct'
-        //  async (req, res) => {
-        //     const selectedItem = req.body;
-        //     console.log(selectedItem);
-        //     const result = await productCollection.insertOne(selectedItem);
-        //     res.send(result);
-        // });
-        app.post('/cartProduct', async (req, res) => {
-            const selectedItem = req.body;
-            console.log(selectedItem);
-            const result = await cartCollection.insertOne(selectedItem);
+                    name: updateProduct.name,
+                    photo: updateProduct.photo,
+                    brand: updateProduct.brand,
+                    price: updateProduct.price,
+                    category: updateProduct.category,
+                    ratings: updateProduct.ratings,
+                    description: updateProduct.description,
+                },
+            }
+            const result = await productCollection.updateOne(filter, product, options);
             res.send(result);
         });
-        
 
+
+        // cart products
+        
+        app.post('/cart', async (req, res) => {
+            const cart = req.body;
+            console.log(cart);
+            const result = await cartCollection.insertOne(cart);
+            res.send(result);
+        });
+
+app.get('/carts',async(req,res)=>{
+    const cursor=cartCollection.find();
+    const carts=await cursor.toArray();
+    res.send(carts);
+})
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });
